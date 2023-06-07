@@ -250,20 +250,22 @@ class LocalDocQA:
                 except Exception as e:
                     logger.error(e)
                     logger.info(f"{file} 未能成功加载")
+
+        #============下面开始解析.
         if len(docs) > 0:
             logger.info("文件加载完毕，正在生成向量库")
-            if vs_path and os.path.isdir(vs_path) and "index.faiss" in os.listdir(vs_path):
+            if vs_path and os.path.isdir(vs_path) and "index.faiss" in os.listdir(vs_path): # 如果路径里面已经有vs_path说明之前生成过,所以我们就需要先load之前的.再add进去新的doc
                 vector_store = load_vector_store(vs_path, self.embeddings)
                 vector_store.add_documents(docs)
                 torch_gc()
             else:
-                if not vs_path:
+                if not vs_path: # 如果是第一次创建. 那么我们创建文本.然后创建
                     vs_path = os.path.join(VS_ROOT_PATH,
                                            f"""{"".join(lazy_pinyin(os.path.splitext(file)[0]))}_FAISS_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}""")
-                vector_store = FAISS.from_documents(docs, self.embeddings)  # docs 为Document列表
+                vector_store = FAISS.from_documents(docs, self.embeddings)  # 创建即可.docs 为Document列表
                 torch_gc()
 
-            vector_store.save_local(vs_path)
+            vector_store.save_local(vs_path)#存回去.
             return vs_path, loaded_files
         else:
             logger.info("文件均未成功加载，请检查依赖包或替换为其他文件再次上传。")
@@ -289,14 +291,15 @@ class LocalDocQA:
         except Exception as e:
             logger.error(e)
             return None, [one_title]
-
+#================下面我们修改这个知识库问题.
     def get_knowledge_based_answer(self, query, vs_path, chat_history=[], streaming: bool = STREAMING):
-        vector_store = load_vector_store(vs_path, self.embeddings)
+        vector_store = load_vector_store(vs_path, self.embeddings) #获取知识库.
         FAISS.similarity_search_with_score_by_vector = similarity_search_with_score_by_vector
         vector_store.chunk_size = self.chunk_size
         vector_store.chunk_conent = self.chunk_conent
         vector_store.score_threshold = self.score_threshold
         related_docs_with_score = vector_store.similarity_search_with_score(query, k=self.top_k)
+        print('打印调用知识库中的相关doc9999999999999999999999',related_docs_with_score)
         torch_gc()
         prompt = generate_prompt(related_docs_with_score, query)
 
@@ -338,7 +341,7 @@ class LocalDocQA:
     def get_search_result_based_answer(self, query, chat_history=[], streaming: bool = STREAMING):
         results = bing_search(query)
         result_docs = search_result2docs(results)
-        prompt = generate_prompt(result_docs, query)
+        prompt = generate_prompt(result_docs, query) # 拼接提示词, 给llm即可.
 
         for answer_result in self.llm.generatorAnswer(prompt=prompt, history=chat_history,
                                                       streaming=streaming):

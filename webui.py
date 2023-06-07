@@ -164,17 +164,31 @@ def get_vector_store(vs_id, files, sentence_size, history, one_conent, one_conte
     return vs_path, None, history + [[None, file_status]]
 
 
+
+
+
+
+
+#========根据选项卡, 改变页面.
 def change_vs_name_input(vs_id, history):
-    if vs_id == "新建知识库":
+    if vs_id == "新建知识库": #如果新建知识库,
         return gr.update(visible=True), gr.update(visible=True), gr.update(visible=False), None, history
     else:
         vs_path = os.path.join(VS_ROOT_PATH, vs_id)
-        if "index.faiss" in os.listdir(vs_path):
+        if "index.faiss" in os.listdir(vs_path): #如果里面有faiss文件,说明知识库里面已经做好了向量化.
             file_status = f"已加载知识库{vs_id}，请开始提问"
-        else:
+        else: # 否则提示失败.
             file_status = f"已选择知识库{vs_id}，当前知识库中未上传文件，请先上传文件后，再开始提问"
         return gr.update(visible=False), gr.update(visible=False), gr.update(visible=True), \
                vs_path, history + [[None, file_status]]
+
+
+
+
+
+
+
+
 
 
 knowledge_base_test_mode_info = ("【注意】\n\n"
@@ -187,10 +201,10 @@ knowledge_base_test_mode_info = ("【注意】\n\n"
                                  "本界面中修改的参数并不会直接修改对话界面中参数，仍需前往`configs/model_config.py`修改后生效。"
                                  "相关参数将在后续版本中支持本界面直接修改。")
 
-
+# gr.update() 里面写一个语句, 那么触发之后就运行这个语句.
 def change_mode(mode, history):
     if mode == "知识库问答":
-        return gr.update(visible=True), gr.update(visible=False), history
+        return gr.update(visible=True), gr.update(visible=True), history
         # + [[None, "【注意】：您已进入知识库问答模式，您输入的任何查询都将进行知识库查询，然后会自动整理知识库关联内容进入模型查询！！！"]]
     elif mode == "知识库测试":
         return gr.update(visible=True), gr.update(visible=True), [[None,
@@ -215,7 +229,7 @@ def change_chunk_conent(mode, label_conent, history):
 def add_vs_name(vs_name, chatbot):
     if vs_name in get_vs_list():
         vs_status = "与已有知识库名称冲突，请重新选择其他名称后提交"
-        chatbot = chatbot + [[None, vs_status]]
+        chatbot = chatbot + [[None, vs_status]] #添加一句回答.然后下一句,更新chatbox内容.
         return gr.update(visible=True), gr.update(visible=True), gr.update(visible=True), gr.update(
             visible=False), chatbot
     else:
@@ -229,6 +243,18 @@ def add_vs_name(vs_name, chatbot):
         chatbot = chatbot + [[None, vs_status]]
         return gr.update(visible=True, choices=get_vs_list(), value=vs_name), gr.update(
             visible=False), gr.update(visible=False), gr.update(visible=True), chatbot
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 自动化加载固定文件间中文件
@@ -271,8 +297,8 @@ block_css = """.importantButton {
 
 
 webui_title = """
-# 🎉langchain-ChatGLM WebUI🎉
-👍 [https://github.com/imClumsyPanda/langchain-ChatGLM](https://github.com/imClumsyPanda/langchain-ChatGLM)
+# langchain-ChatGLM 
+
 """
 default_vs = get_vs_list()[0] if len(get_vs_list()) > 1 else "为空"
 init_message = f"""欢迎使用 langchain-ChatGLM Web UI！
@@ -299,7 +325,7 @@ default_theme_args = dict(
 with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as demo:
 
 
-
+    # gr.State是 session 状态里面的变量. 他会在每次刷新浏览器的时候重新计算.
 
     vs_path, file_status, model_status = gr.State(
         os.path.join(VS_ROOT_PATH, get_vs_list()[0]) if len(get_vs_list()) > 1 else ""), gr.State(""), gr.State(
@@ -311,6 +337,7 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
 
     gr.Markdown(webui_title)
     #=========整体是3个tab页面.
+    #2023-06-07,12点44 llm对话删了. 
     with gr.Tab("对话"):
         with gr.Row():
             with gr.Column(scale=10):
@@ -320,21 +347,30 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                 query = gr.Textbox(show_label=False,
                                    placeholder="请输入提问内容，按回车进行提交").style(container=False)
             with gr.Column(scale=5):
-                mode = gr.Radio(["LLM 对话", "知识库问答", "Bing搜索问答"],
+                #"LLM 对话"
+                mode = gr.Radio([ "知识库问答", "Bing搜索问答"],
                                 label="请选择使用模式",
                                 value="知识库问答", )
-                knowledge_set = gr.Accordion("知识库设定", visible=False)
+                #=======设置2个手风琴菜单.
+                knowledge_set = gr.Accordion("知识库设定", visible=True) # =======这个地方应该设置为开.
                 vs_setting = gr.Accordion("配置知识库")
                 mode.change(fn=change_mode,
                             inputs=[mode, chatbot],
                             outputs=[vs_setting, knowledge_set, chatbot])
+
+
+
+
+
+
                 with vs_setting:
+                    #===先写完全部的按钮,
                     vs_refresh = gr.Button("更新已有知识库选项")
                     select_vs = gr.Dropdown(get_vs_list(),
                                             label="请选择要加载的知识库",
                                             interactive=True,
                                             value=get_vs_list()[0] if len(get_vs_list()) > 0 else None
-                                            )
+                                            ) # value是dropdown下拉框的默认值.
                     vs_name = gr.Textbox(label="请输入新建知识库名称，当前知识库命名暂不支持中文",
                                          lines=1,
                                          interactive=True,
@@ -358,15 +394,22 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                                                    file_count="directory",
                                                    show_label=False)
                             load_folder_button = gr.Button("上传文件夹并加载知识库")
+
+
+
+
+#再写所有按钮的click函数.
                     vs_refresh.click(fn=refresh_vs_list,
                                      inputs=[],
                                      outputs=select_vs)
+#添加一个知识库触发的函数.
                     vs_add.click(fn=add_vs_name,
                                  inputs=[vs_name, chatbot],
                                  outputs=[select_vs, vs_name, vs_add, file2vs, chatbot])
                     select_vs.change(fn=change_vs_name_input,
                                      inputs=[select_vs, chatbot],
                                      outputs=[vs_name, vs_add, file2vs, vs_path, chatbot])
+#下面这2个是核心函数, 把文件给向量化.
                     load_file_button.click(get_vector_store,
                                            show_progress=True,
                                            inputs=[select_vs, files, sentence_size, chatbot, vs_add, vs_add],
@@ -377,9 +420,24 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                                                      vs_add],
                                              outputs=[vs_path, folder_files, chatbot], )
                     flag_csv_logger.setup([query, vs_path, chatbot, mode], "flagged")
+#==========下面这个函数就用来触发返回答案功能!!!!!!最核心函数.
                     query.submit(get_answer,
                                  [query, vs_path, chatbot, mode],
                                  [chatbot, query])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     with gr.Tab("知识库测试 Beta"):
         with gr.Row():
             with gr.Column(scale=10):
@@ -480,7 +538,8 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                                  [query, vs_path, chatbot, mode, score_threshold, vector_search_top_k, chunk_conent,
                                   chunk_sizes],
                                  [chatbot, query])
-    with gr.Tab("模型配置"):
+    if 0:
+     with gr.Tab("模型配置"):
         llm_model = gr.Radio(llm_model_dict_list,
                              label="LLM 模型",
                              value=LLM_MODEL,
