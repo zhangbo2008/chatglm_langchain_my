@@ -300,6 +300,7 @@ class LocalDocQA:
         vector_store.score_threshold = self.score_threshold
         related_docs_with_score = vector_store.similarity_search_with_score(query, k=self.top_k)
         print('打印调用知识库中的相关doc9999999999999999999999',related_docs_with_score)
+        print('知识库信息打印完毕')
         torch_gc()
         prompt = generate_prompt(related_docs_with_score, query)
         #===================判断是否在稳重出现,出现了

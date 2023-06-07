@@ -358,7 +358,22 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                             inputs=[mode, chatbot],
                             outputs=[vs_setting, knowledge_set, chatbot])
 
-
+                with knowledge_set:
+                    score_threshold = gr.Number(value=VECTOR_SEARCH_SCORE_THRESHOLD,
+                                                label="知识相关度 Score 阈值，分值越低匹配度越高",
+                                                precision=0,
+                                                interactive=True)
+                    vector_search_top_k = gr.Number(value=VECTOR_SEARCH_TOP_K, precision=0,
+                                                    label="获取知识库内容条数", interactive=True)
+                    chunk_conent = gr.Checkbox(value=False,
+                                               label="是否启用上下文关联",
+                                               interactive=True)
+                    chunk_sizes = gr.Number(value=CHUNK_SIZE, precision=0,
+                                            label="匹配单段内容的连接上下文后最大长度",
+                                            interactive=True, visible=False)
+                    chunk_conent.change(fn=change_chunk_conent,
+                                        inputs=[chunk_conent, gr.Textbox(value="chunk_conent", visible=False), chatbot],
+                                        outputs=[chunk_sizes, chatbot])
 
 
 
@@ -458,7 +473,7 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                             outputs=[vs_setting, knowledge_set, chatbot])
                 with knowledge_set:
                     score_threshold = gr.Number(value=VECTOR_SEARCH_SCORE_THRESHOLD,
-                                                label="知识相关度 Score 阈值，分值越低匹配度越高",
+                                                label="知识检索内容相关度 Score, 数值范围约为0-1100，如果为0，则不生效，经测试设置为小于500时，匹配结果更精准",
                                                 precision=0,
                                                 interactive=True)
                     vector_search_top_k = gr.Number(value=VECTOR_SEARCH_TOP_K, precision=0,
