@@ -13,7 +13,8 @@ from models.loader import LoaderCheckPoint
 
 nltk.data.path = [NLTK_DATA_PATH] + nltk.data.path
 # 2023-06-06,23点10  ,添加本地知识库的智齿.
-
+print('打印路径变量.!!!!!!!!!')
+print(VS_ROOT_PATH,VS_ROOT_PATH)
 def get_vs_list(): #vector_store 叫vs #读取本地知识库, 然后把列表返回.
     lst_default = ["新建知识库"]
     if not os.path.exists(VS_ROOT_PATH):
@@ -347,8 +348,7 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                 query = gr.Textbox(show_label=False,
                                    placeholder="请输入提问内容，按回车进行提交").style(container=False)
             with gr.Column(scale=5):
-                #"LLM 对话"
-                mode = gr.Radio([ "知识库问答", "Bing搜索问答"],
+                mode = gr.Radio(["LLM 对话", "知识库问答", "Bing搜索问答"],
                                 label="请选择使用模式",
                                 value="知识库问答", )
                 #=======设置2个手风琴菜单.

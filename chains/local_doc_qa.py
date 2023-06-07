@@ -302,7 +302,7 @@ class LocalDocQA:
         print('打印调用知识库中的相关doc9999999999999999999999',related_docs_with_score)
         torch_gc()
         prompt = generate_prompt(related_docs_with_score, query)
-
+        #===================判断是否在稳重出现,出现了
         for answer_result in self.llm.generatorAnswer(prompt=prompt, history=chat_history,
                                                       streaming=streaming):
             resp = answer_result.llm_output["answer"]
