@@ -437,11 +437,11 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                     flag_csv_logger.setup([query, vs_path, chatbot, mode], "flagged")
 #==========下面这个函数就用来触发返回答案功能!!!!!!最核心函数.
 
-
+                    
                     query.submit(get_answer,
                                  [query, vs_path, chatbot, mode, score_threshold, vector_search_top_k, chunk_conent,
                                   chunk_sizes],
-                                 [chatbot, query])
+                                 [chatbot, query],api_name='tiwen')
 
 
 
