@@ -8,6 +8,7 @@ with demo:
     num = gr.State(value=a)
     squared = gr.Number(value=a*a)
     btn = gr.Button("Next Square", elem_id="btn", elem_classes=["abc", "def"])
+    btn = gr.Button("Next Square2", elem_id="btn", elem_classes=["abc", "def"])
 
     stats = gr.State(value=default_json)
     table = gr.JSON()
@@ -18,6 +19,7 @@ with demo:
         return var, var**2, stats_history, stats_history
 
     btn.click(increase, [num, stats], [num, squared, stats, table],api_name="addition")
+    btn.click(increase, [num, stats], [num, squared, stats, table],)
 
 if __name__ == "__main__":
     demo.launch()
