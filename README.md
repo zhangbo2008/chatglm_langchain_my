@@ -1,6 +1,16 @@
 api问题:KeyError: 'serialized_input'   : I have solve this problem. Using gradio==3.26.0. But I still want to know why this problem occurs?
 
+文档切割问题的优化:
+目前用的是换行来切割文档:所以下面是demo文档. 尽量保持文档按照这个样式排列文字:
+  格式化之后的文档例子://这个样式表示3个doc, 每个doc之间需要用至少1个换行来表示.
+  aaaaaaaaaaaaaa          
 
+  bbbbbbbbbbbbbbb
+  ccccccccccccc
+
+
+  ddddddddddddddddd
+  ddddddddddddddd
 
 
 api:  python webui.py
