@@ -209,6 +209,7 @@ class LocalDocQA:
                                     filepath: str or List[str],
                                     vs_path: str or os.PathLike = None,
                                     sentence_size=SENTENCE_SIZE):
+        print('正在解析一堆知识')
         loaded_files = []
         failed_files = []
         if isinstance(filepath, str):
@@ -217,7 +218,7 @@ class LocalDocQA:
                 return None
             elif os.path.isfile(filepath):
                 file = os.path.split(filepath)[-1]
-                try:
+                try:#========加载单独文件.
                     docs = load_file(filepath, sentence_size)
                     logger.info(f"{file} 已成功加载")
                     loaded_files.append(filepath)
@@ -272,6 +273,7 @@ class LocalDocQA:
             return None, loaded_files
 
     def one_knowledge_add(self, vs_path, one_title, one_conent, one_content_segmentation, sentence_size):
+        print('你正在添加一条知识')
         try:
             if not vs_path or not one_title or not one_conent:
                 logger.info("知识库添加错误，请确认知识库名字、标题、内容是否正确！")

@@ -164,30 +164,8 @@ def get_vector_store(vs_id, files, sentence_size, history, one_conent, one_conte
     logger.info(file_status)
     return vs_path, None, history + [[None, file_status]]
 
-#geshiahua shangchuan
-def get_vector_store2(vs_id, files, sentence_size, history, one_conent, one_content_segmentation):
-    vs_path = os.path.join(VS_ROOT_PATH, vs_id)
-    filelist = []
-    # if local_doc_qa.llm and local_doc_qa.embeddings:
-    if 1:
-        if isinstance(files, list):
-            for file in files:
-                filename = os.path.split(file.name)[-1]
-                shutil.move(file.name, os.path.join(UPLOAD_ROOT_PATH, vs_id, filename))
-                filelist.append(os.path.join(UPLOAD_ROOT_PATH, vs_id, filename))
-            vs_path, loaded_files = local_doc_qa.init_knowledge_vector_store(filelist, vs_path, sentence_size)
-        else: #============只添加一条知识.
-            vs_path, loaded_files = local_doc_qa.one_knowledge_add(vs_path, files, one_conent, one_content_segmentation,
-                                                                   sentence_size)
-        if len(loaded_files):
-            file_status = f"已添加 {'、'.join([os.path.split(i)[-1] for i in loaded_files if i])} 内容至知识库，并已加载知识库，请开始提问"
-        else:
-            file_status = "文件未成功加载，请重新上传文件"
-    else:
-        file_status = "模型未完成加载，请先在加载模型后再导入文件"
-        vs_path = None
-    logger.info(file_status)
-    return vs_path, None, history + [[None, file_status]]
+
+
 
 
 
@@ -429,18 +407,6 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                                             file_count="multiple",
                                             show_label=False)
                             load_file_button = gr.Button("上传文件并加载知识库")
-                        with gr.Tab("上传格式化文件"):
-                            files = gr.File(label="添加格式化文件,每条用/r/n切割",
-                                            file_types=['.txt', '.md', '.docx', '.pdf', '.png', '.jpg'],
-                                            file_count="multiple",
-                                            show_label=False)
-                            load_fileformat_button = gr.Button("上传格式化文件并加载知识库")
-
-
-
-
-
-
                         with gr.Tab("上传文件夹"):
                             folder_files = gr.File(label="添加文件",
                                                    file_count="directory",
@@ -466,14 +432,6 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                                            show_progress=True,
                                            inputs=[select_vs, files, sentence_size, chatbot, vs_add, vs_add],
                                            outputs=[vs_path, files, chatbot], )
-
-                    load_fileformat_button.click(get_vector_store2,
-                                           show_progress=True,
-                                           inputs=[select_vs, files, sentence_size, chatbot, vs_add, vs_add],
-                                           outputs=[vs_path, files, chatbot], )
-
-
-
                     load_folder_button.click(get_vector_store,
                                              show_progress=True,
                                              inputs=[select_vs, folder_files, sentence_size, chatbot, vs_add,
@@ -482,18 +440,18 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                     flag_csv_logger.setup([query, vs_path, chatbot, mode], "flagged")
 #==========下面这个函数就用来触发返回答案功能!!!!!!最核心函数.
 
-                    stream=True
-                    # query.submit(get_answer,
-                    #              [query, vs_path, chatbot, mode, score_threshold, vector_search_top_k, chunk_conent,
-                    #               chunk_sizes],
-                    #              [chatbot, query],api_name='tiwen')
-
-
-
 
                     query.submit(get_answer,
-                                 [query, vs_path, chatbot, mode],
+                                 [query, vs_path, chatbot, mode, score_threshold, vector_search_top_k, chunk_conent,
+                                  chunk_sizes],
                                  [chatbot, query],api_name='tiwen')
+
+
+
+
+                    # query.submit(get_answer,
+                    #              [query, vs_path, chatbot, mode],
+                    #              [chatbot, query])
 
 
 
@@ -649,11 +607,11 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
         queue=True,
         show_progress=False,
     )
-if __name__ == "__main__":
-    (demo
-    .queue(concurrency_count=3)
-    .launch(server_name='0.0.0.0',
-            server_port=7862,
-            show_api=True,
-            share=False,
-            inbrowser=False))
+
+(demo
+ .queue(concurrency_count=3)
+ .launch(server_name='0.0.0.0',
+         server_port=7860,
+         show_api=True,
+         share=False,
+         inbrowser=False))

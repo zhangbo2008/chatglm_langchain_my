@@ -1,3 +1,24 @@
+api问题:KeyError: 'serialized_input'   : I have solve this problem. Using gradio==3.26.0. But I still want to know why this problem occurs?
+
+
+
+
+api:  python webui.py
+      http://127.0.0.1:7860/api/tiwen
+      {
+        "data": [
+      "aaa","bbb",    [ ["ccc","ccc"]]   ,"LLM 对话"
+      ]}
+
+
+
+
+
+
+
+
+
+
 自己对于版本的二次开发:
 1.删除模型配置tab, 禁止用户手动改这些.
 2.添加删除文档功能.

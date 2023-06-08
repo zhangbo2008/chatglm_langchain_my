@@ -25,6 +25,8 @@ class ChineseTextSplitter(CharacterTextSplitter):
         return sent_list
 
     def split_text(self, text: str) -> List[str]:   ##此处需要进一步优化逻辑
+        text=re.sub(r"\n{3,}", r"\n\n", text) #多回车改成2个回车.
+        text = re.sub("\n\n", "########", text) # 修改.
         if self.pdf:
             text = re.sub(r"\n{3,}", r"\n", text)
             text = re.sub('\s', " ", text)
@@ -38,8 +40,9 @@ class ChineseTextSplitter(CharacterTextSplitter):
         text = text.rstrip()  # 段尾如果有多余的\n就去掉它
         # 很多规则中会考虑分号;，但是这里我把它忽略不计，破折号、英文双引号等同样忽略，需要的再做些简单调整即可。
         ls = [i for i in text.split("\n") if i]
+        ls=''.join(ls).split('########')
         for ele in ls:
-            if len(ele) > self.sentence_size:
+            if len(ele) > self.sentence_size:#下面对于每一个文档如果数量大于100字符进行拆分.
                 ele1 = re.sub(r'([,，.]["’”」』]{0,2})([^,，.])', r'\1\n\2', ele)
                 ele1_ls = ele1.split("\n")
                 for ele_ele1 in ele1_ls:
