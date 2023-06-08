@@ -437,7 +437,7 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
                     flag_csv_logger.setup([query, vs_path, chatbot, mode], "flagged")
 #==========下面这个函数就用来触发返回答案功能!!!!!!最核心函数.
 
-                    
+
                     query.submit(get_answer,
                                  [query, vs_path, chatbot, mode, score_threshold, vector_search_top_k, chunk_conent,
                                   chunk_sizes],
@@ -609,6 +609,6 @@ with gr.Blocks(css=block_css, theme=gr.themes.Default(**default_theme_args)) as 
  .queue(concurrency_count=3)
  .launch(server_name='0.0.0.0',
          server_port=7860,
-         show_api=False,
+         show_api=True,
          share=False,
          inbrowser=False))
