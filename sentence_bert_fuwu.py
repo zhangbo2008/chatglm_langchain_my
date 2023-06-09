@@ -564,11 +564,11 @@ for dex,i in enumerate(all_question):
 
 @app.route("/", methods=["GET", "POST"])
 def root():
-    
+    txt=request.args.get('txt')
     with torch.no_grad():
 
             # To extract sentence representations for training data
-            t = tokenizer('招待外部人员的费用', return_tensors="pt")
+            t = tokenizer(txt, return_tensors="pt")
             training_outputs = model(**t, output_hidden_states=True)
             t2 = torch.mean(training_outputs.hidden_states[-1].squeeze(), dim=0)
 
