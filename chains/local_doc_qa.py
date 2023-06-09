@@ -254,6 +254,7 @@ class LocalDocQA:
                     logger.info(f"{file} 未能成功加载")
 
         #============下面开始解析.
+        print('刚才上传的文档切分后是',docs)
         if len(docs) > 0:
             logger.info("文件加载完毕，正在生成向量库")
             if vs_path and os.path.isdir(vs_path) and "index.faiss" in os.listdir(vs_path): # 如果路径里面已经有vs_path说明之前生成过,所以我们就需要先load之前的.再add进去新的doc
