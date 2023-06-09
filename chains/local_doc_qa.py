@@ -302,6 +302,7 @@ class LocalDocQA:
         vector_store.chunk_size = self.chunk_size
         vector_store.chunk_conent = self.chunk_conent
         vector_store.score_threshold = self.score_threshold
+        print(vector_store.chunk_conent,'打印知识库')
         related_docs_with_score = vector_store.similarity_search_with_score(query, k=self.top_k)
         print('打印调用知识库中的相关doc9999999999999999999999',related_docs_with_score)
         print('知识库信息打印完毕')

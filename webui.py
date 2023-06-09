@@ -38,6 +38,8 @@ flag_csv_logger = gr.CSVLogger()
 def get_answer(query, vs_path, history, mode, score_threshold=VECTOR_SEARCH_SCORE_THRESHOLD,
                vector_search_top_k=VECTOR_SEARCH_TOP_K, chunk_conent: bool = True,
                chunk_size=CHUNK_SIZE, streaming: bool = STREAMING):
+    
+    
     if mode == "Bing搜索问答":
         for resp, history in local_doc_qa.get_search_result_based_answer(
                 query=query, chat_history=history, streaming=streaming):
@@ -324,13 +326,7 @@ webui_title = """
 
 """
 default_vs = get_vs_list()[0] if len(get_vs_list()) > 1 else "为空"
-init_message = f"""欢迎使用 langchain-ChatGLM Web UI！
-
-请在右侧切换模式，目前支持直接与 LLM 模型对话或基于本地知识库问答。
-
-知识库问答模式，选择知识库名称后，即可开始问答，当前知识库{default_vs}，如有需要可以在选择知识库名称后上传文件/文件夹至知识库。
-
-知识库暂不支持文件删除，该功能将在后续版本中推出。
+init_message = f"""
 """
 
 # 初始化消息
@@ -338,6 +334,7 @@ try:
     model_status = init_model()
 except:
         model_status=''
+model_status=''
 #设置主题样式.
 default_theme_args = dict( 
     font=["Source Sans Pro", 'ui-sans-serif', 'system-ui', 'sans-serif'],
